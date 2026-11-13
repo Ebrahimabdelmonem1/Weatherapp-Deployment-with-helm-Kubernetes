@@ -1,0 +1,23 @@
+weatherapp has been deployed.
+
+Components installed:
+  - weather   ({{ .Values.weather.name }})
+  - ui        ({{ .Values.ui.name }})
+{{- if .Values.auth.enabled }}
+  - auth      ({{ .Values.auth.name }})
+{{- end }}
+{{- if .Values.mysql.enabled }}
+  - mysql     (StatefulSet, headless service, init Job)
+{{- end }}
+{{- if .Values.ingress.enabled }}
+
+Ingress host: {{ .Values.ingress.host }}
+Add an entry to /etc/hosts pointing this host at your ingress controller's
+external IP, e.g.:
+  <INGRESS_IP>  {{ .Values.ingress.host }}
+{{- end }}
+
+Before using this in anything beyond a local lab:
+  - Replace mysql.auth.rootPassword / authPassword / secretKey and
+    weather.apiKey in values.yaml (or via --set / a values override file)
+    with real secrets, not the lab placeholders.

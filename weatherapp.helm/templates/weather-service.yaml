@@ -1,0 +1,16 @@
+apiVersion: v1
+kind: Service
+metadata:
+  name: {{ .Values.weather.name }}
+  labels:
+    {{- include "weatherapp.labels" . | nindent 4 }}
+    app.kubernetes.io/name: {{ .Values.weather.name }}
+spec:
+  type: {{ .Values.weather.service.type }}
+  ports:
+    - port: {{ .Values.weather.service.port }}
+      targetPort: http
+      protocol: TCP
+      name: http
+  selector:
+    app.kubernetes.io/name: {{ .Values.weather.name }}

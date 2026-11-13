@@ -1,0 +1,17 @@
+{{- if .Values.auth.enabled }}
+apiVersion: v1
+kind: Service
+metadata:
+  name: {{ .Values.auth.name }}
+  labels:
+    {{- include "weatherapp.labels" . | nindent 4 }}
+    app.kubernetes.io/name: {{ .Values.auth.name }}
+spec:
+  type: {{ .Values.auth.service.type }}
+  ports:
+    - port: {{ .Values.auth.service.port }}
+      targetPort: {{ .Values.auth.service.port }}
+      protocol: TCP
+  selector:
+    app.kubernetes.io/name: {{ .Values.auth.name }}
+{{- end }}

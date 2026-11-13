@@ -1,0 +1,6 @@
+apiVersion: v2
+name: weatherapp
+description: Helm chart for the weatherapp microservices lab (UI, weather, auth, mysql)
+type: application
+version: 0.1.0
+appVersion: "lab"
