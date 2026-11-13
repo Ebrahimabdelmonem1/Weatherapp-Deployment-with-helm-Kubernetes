@@ -1,0 +1,59 @@
+{{- if .Values.mysql.enabled }}
+apiVersion: apps/v1
+kind: StatefulSet
+metadata:
+  name: mysql
+  labels:
+    {{- include "weatherapp.labels" . | nindent 4 }}
+    app: mysql
+spec:
+  serviceName: "mysql"
+  replicas: 1
+  selector:
+    matchLabels:
+      app: mysql
+  template:
+    metadata:
+      labels:
+        app: mysql
+    spec:
+      containers:
+        - name: mysql
+          image: "{{ .Values.mysql.image.repository }}:{{ .Values.mysql.image.tag }}"
+          env:
+            - name: MYSQL_ROOT_PASSWORD
+              valueFrom:
+                secretKeyRef:
+                  name: mysql-secret
+                  key: root-password
+            - name: MYSQL_AUTH_PASSWORD
+              valueFrom:
+                secretKeyRef:
+                  name: mysql-secret
+                  key: auth-password
+            - name: MYSQL_USER
+              value: {{ .Values.auth.db.user | quote }}
+            - name: MYSQL_PASSWORD
+              valueFrom:
+                secretKeyRef:
+                  name: mysql-secret
+                  key: auth-password
+          volumeMounts:
+            - name: mysql-persistent-storage
+              mountPath: /var/lib/mysql
+            - name: config-volume
+              mountPath: /docker-entrypoint-initdb.d
+      volumes:
+        - name: config-volume
+          configMap:
+            name: mysql-config
+  volumeClaimTemplates:
+    - metadata:
+        name: mysql-persistent-storage
+      spec:
+        accessModes: [ "ReadWriteOnce" ]
+        storageClassName: {{ .Values.mysql.storage.className | quote }}
+        resources:
+          requests:
+            storage: {{ .Values.mysql.storage.size }}
+{{- end }}

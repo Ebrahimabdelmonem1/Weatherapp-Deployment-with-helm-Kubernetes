@@ -1,0 +1,86 @@
+# Default values for weatherapp.
+
+# ---------------------------------------------------------------------------
+# weather microservice
+# ---------------------------------------------------------------------------
+weather:
+  name: weatherapp-weather
+  replicaCount: 2
+  image:
+    repository: afakharany/weatherapp-weather
+    tag: lab
+    pullPolicy: IfNotPresent
+  service:
+    type: ClusterIP
+    port: 5000
+  # Plain-text API key -- the template base64-encodes it into the Secret.
+  apiKey: "6d92c50bdamsh81137f3b87ace1fp1d53eejsnfe818b9dbc83"
+
+# ---------------------------------------------------------------------------
+# ui (frontend) microservice
+# ---------------------------------------------------------------------------
+ui:
+  name: weatherapp-ui
+  replicaCount: 2
+  image:
+    repository: afakharany/weatherapp-ui
+    tag: lab
+    pullPolicy: IfNotPresent
+  service:
+    type: ClusterIP
+    port: 3000
+
+# ---------------------------------------------------------------------------
+# auth microservice
+# ---------------------------------------------------------------------------
+auth:
+  enabled: true
+  name: weatherapp-auth
+  replicaCount: 1
+  image:
+    repository: afakharany/weatherapp-auth
+    tag: lab
+    pullPolicy: IfNotPresent
+  service:
+    type: ClusterIP
+    port: 8080
+  db:
+    user: authuser
+    name: weatherapp
+    port: "3306"
+
+# ---------------------------------------------------------------------------
+# mysql (StatefulSet + headless service + one-shot init Job)
+# ---------------------------------------------------------------------------
+mysql:
+  enabled: true
+  image:
+    repository: mysql
+    tag: "5.7"
+  storage:
+    className: standard
+    size: 10Gi
+  # Plain-text credentials -- the template base64-encodes them into a Secret.
+  # CHANGE THESE before deploying to anything but a local lab.
+  auth:
+    rootPassword: "admin_pass"
+    authPassword: "auth_pass"
+    secretKey: "secret-key"
+  initJob:
+    enabled: true
+  # Optional: contents for /docker-entrypoint-initdb.d, keyed by filename.
+  # Left empty by default -- the mysql-init-job handles DB/user creation
+  # instead. Fill this in only if you need extra init scripts to run.
+  initConfig: {}
+
+# ---------------------------------------------------------------------------
+# ingress (fronts the ui service)
+# ---------------------------------------------------------------------------
+ingress:
+  enabled: true
+  name: weatherapp-ui-ingress
+  className: nginx
+  host: weatherapp.local
+  tls:
+    enabled: true
+    secretName: weatherapp-ui-tls

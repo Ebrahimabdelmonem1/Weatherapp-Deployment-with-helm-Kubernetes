@@ -1,0 +1,19 @@
+{{- if .Values.mysql.enabled }}
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: mysql-config
+  labels:
+    {{- include "weatherapp.labels" . | nindent 4 }}
+data:
+  {{- if .Values.mysql.initConfig }}
+  {{- range $filename, $content := .Values.mysql.initConfig }}
+  {{ $filename }}: |
+    {{- $content | nindent 4 }}
+  {{- end }}
+  {{- else }}
+  # No init scripts provided; DB/user creation is handled by the
+  # mysql-init-job instead. Populate .Values.mysql.initConfig to mount
+  # files into /docker-entrypoint-initdb.d.
+  {{- end }}
+{{- end }}
