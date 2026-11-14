@@ -14,7 +14,7 @@ weather:
     type: ClusterIP
     port: 5000
   # Plain-text API key -- the template base64-encodes it into the Secret.
-  apiKey: "6d92c50bdamsh81137f3b87ace1fp1d53eejsnfe818b9dbc83"
+  apiKey: ""
 
 # ---------------------------------------------------------------------------
 # ui (frontend) microservice
